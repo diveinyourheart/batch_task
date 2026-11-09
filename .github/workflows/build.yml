@@ -1,0 +1,19 @@
+name: Build and test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [Debug, Release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build/ci -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+      - name: Build
+        run: cmake --build build/ci --config ${{ matrix.config }} --parallel 2
+      - name: Test
+        run: ctest --test-dir build/ci -C ${{ matrix.config }} --output-on-failure
